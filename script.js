@@ -190,7 +190,122 @@ class TicTacToe {
             this.makeMove(index);
         }
     }
-
+    createFireworks() {
+        const colors = ['#FFD700', '#FFA500', '#FF8C00', '#FF6347', '#4CAF50', '#3498db'];
+        const fireworksContainer = document.createElement('div');
+        fireworksContainer.className = 'fireworks-container';
+        document.body.appendChild(fireworksContainer);
+    
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                firework.style.setProperty('--x', `${Math.random() * 100}vw`);
+                firework.style.setProperty('--initialY', '100vh');
+                firework.style.setProperty('--finalY', `${Math.random() * 50}vh`);
+                firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                fireworksContainer.appendChild(firework);
+            }, i * 50);
+        }
+    
+        setTimeout(() => {
+            document.body.removeChild(fireworksContainer);
+        }, 3000);
+    }
+    
+    createStarBurst(x, y) {
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.left = x + 'px';
+        container.style.top = y + 'px';
+        container.style.pointerEvents = 'none';
+        document.body.appendChild(container);
+    
+        for (let i = 0; i < 12; i++) {
+            const star = document.createElement('div');
+            star.className = 'star-burst';
+            star.style.transform = `rotate(${i * 30}deg)`;
+            container.appendChild(star);
+        }
+    
+        setTimeout(() => {
+            document.body.removeChild(container);
+        }, 1000);
+    }
+    
+    showTrophy() {
+        const trophy = document.createElement('div');
+        trophy.className = 'trophy';
+        trophy.textContent = '🏆';
+        document.body.appendChild(trophy);
+    
+        setTimeout(() => {
+            document.body.removeChild(trophy);
+        }, 2000);
+    }
+    
+    handleWin() {
+        this.isGameActive = false;
+        
+        // Animate winning cells with delay
+        if (this.winningCombination) {
+            this.winningCombination.forEach((index, i) => {
+                setTimeout(() => {
+                    const cell = this.cells[index];
+                    cell.classList.add('winner');
+                    
+                    // Create star burst effect at cell position
+                    const rect = cell.getBoundingClientRect();
+                    this.createStarBurst(
+                        rect.left + rect.width / 2,
+                        rect.top + rect.height / 2
+                    );
+                }, i * 200);
+            });
+        }
+    
+        // Create multiple effects
+        setTimeout(() => {
+            this.createFireworks();
+            this.showTrophy();
+        }, 500);
+    
+        // Show winning modal with delay
+        setTimeout(() => {
+            this.showModal('🎉 Winner!', `Player ${this.currentPlayer} wins!`);
+        }, 2000);
+    }
+    
+    showModal(title, message) {
+        if (!this.gameStarted) return;
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <button class="premium-button">
+                    <span>Play Again</span>
+                </button>
+            </div>
+        `;
+        
+        // Add animation classes
+        modal.classList.add('modal-animate');
+        
+        document.body.appendChild(modal);
+        
+        const button = modal.querySelector('button');
+        button.addEventListener('click', () => {
+            modal.classList.add('modal-exit');
+            setTimeout(() => {
+                document.body.removeChild(modal);
+                this.resetGame();
+            }, 500);
+        });
+    }
+    
     getBestMove() {
         switch(this.difficulty) {
             case 'easy':
