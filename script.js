@@ -37,7 +37,7 @@ class TicTacToe {
                 this.difficultySelect.classList.add('hidden');
             });
         });
-
+    
         this.cells.forEach(cell => {
             cell.addEventListener('click', () => this.handleCellClick(cell));
             
@@ -52,7 +52,18 @@ class TicTacToe {
                 delete cell.dataset.hover;
             });
         });
+    
+        this.resetButton.addEventListener('click', () => this.resetGame());
+    
+        // Update modal button event listener
+        this.modalButton.addEventListener('click', () => {
+            this.modal.classList.add('hidden');
+            this.resetGame();
+            this.isGameActive = true; // Ensure game is active after reset
+            this.updateTurnIndicator(); // Update the turn indicator
+        });
     }
+    
 
     startTwoPlayerGame() {
         this.gameMode = '2player';
@@ -263,18 +274,24 @@ class TicTacToe {
     }
 
     showModal(title, message) {
+        if (!this.gameStarted) return;
+        
         this.modalTitle.textContent = title;
         this.modalMessage.textContent = message;
         this.modal.classList.remove('hidden');
+        this.isGameActive = false; // Ensure game is inactive when modal is shown
     }
+    
 
     resetGame() {
         if (!this.gameStarted) return;
         
+        // Reset the board array
         this.board = Array(9).fill('');
         this.currentPlayer = 'X';
         this.isGameActive = true;
         
+        // Clear all cells
         this.cells.forEach(cell => {
             cell.removeAttribute('data-symbol');
             cell.removeAttribute('data-hover');
@@ -283,9 +300,25 @@ class TicTacToe {
             cell.style.animation = null;
         });
         
+        // Reset visual elements
         this.winLine.style.opacity = '0';
+        this.modal.classList.add('hidden');
         this.updateTurnIndicator();
+    
+        // If it's AI mode and AI goes first (O), make AI move
+        if (this.gameMode === 'ai' && this.currentPlayer === 'O') {
+            setTimeout(() => this.makeAIMove(), 500);
+        }
     }
+    restartGame() {
+        this.resetGame();
+        this.isGameActive = true;
+        this.updateTurnIndicator();
+        
+        // Hide modal
+        this.modal.classList.add('hidden');
+    }
+    
     
 }
 
