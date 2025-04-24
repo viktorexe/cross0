@@ -27,41 +27,48 @@ class TicTacToe {
     }
 
     setupEventListeners() {
-        document.getElementById('twoPlayer').addEventListener('click', () => this.startTwoPlayerGame());
-        document.getElementById('vsAI').addEventListener('click', () => this.startAIGame());
-        
+        // Game mode buttons
+        ['twoPlayer', 'vsAI'].forEach(id => {
+            const button = document.getElementById(id);
+            this.addTouchClickHandler(button, () => {
+                if (id === 'twoPlayer') this.startTwoPlayerGame();
+                else this.startAIGame();
+            });
+        });
+    
+        // Difficulty buttons
         document.querySelectorAll('.difficulty-btn').forEach(button => {
-            button.addEventListener('click', () => {
+            this.addTouchClickHandler(button, () => {
                 this.difficulty = button.dataset.difficulty;
                 this.startGame();
                 this.difficultySelect.classList.add('hidden');
             });
         });
     
+        // Cell interactions
         this.cells.forEach(cell => {
-            cell.addEventListener('click', () => this.handleCellClick(cell));
-            
-            // Add hover effects
-            cell.addEventListener('mouseenter', () => {
-                if (!cell.dataset.symbol && this.isGameActive) {
-                    cell.dataset.hover = this.currentPlayer;
-                }
-            });
-            
-            cell.addEventListener('mouseleave', () => {
-                delete cell.dataset.hover;
-            });
+            // Combined touch/click handler for cells
+            this.addTouchClickHandler(cell, () => this.handleCellClick(cell));
+    
+            // Hover effects (only for non-touch devices)
+            if (window.matchMedia('(hover: hover)').matches) {
+                cell.addEventListener('mouseenter', () => {
+                    if (!cell.dataset.symbol && this.isGameActive) {
+                        cell.dataset.hover = this.currentPlayer;
+                    }
+                });
+                
+                cell.addEventListener('mouseleave', () => {
+                    delete cell.dataset.hover;
+                });
+            }
         });
     
-        this.resetButton.addEventListener('click', () => this.resetGame());
+        // Reset button
+        this.addTouchClickHandler(this.resetButton, () => this.resetGame());
     
-        // Update modal button event listener
-        this.modalButton.addEventListener('click', () => {
-            this.modal.classList.add('hidden');
-            this.resetGame();
-            this.isGameActive = true; // Ensure game is active after reset
-            this.updateTurnIndicator(); // Update the turn indicator
-        });
+        // Modal button
+        this.addTouchClickHandler(this.modalButton, () => this.restartGame());
     }
     
 
@@ -83,14 +90,59 @@ class TicTacToe {
         this.resetGame();
         this.updateTurnIndicator();
     }
-
+    addTouchClickHandler(element, handler) {
+        let touchStartTime;
+        let touchStartX;
+        let touchStartY;
+        
+        element.addEventListener('touchstart', (e) => {
+            touchStartTime = Date.now();
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+    
+        element.addEventListener('touchend', (e) => {
+            const touchEndTime = Date.now();
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            
+            // Check if it's a tap (quick touch without much movement)
+            const touchDuration = touchEndTime - touchStartTime;
+            const touchDistance = Math.sqrt(
+                Math.pow(touchEndX - touchStartX, 2) + 
+                Math.pow(touchEndY - touchStartY, 2)
+            );
+    
+            if (touchDuration < 300 && touchDistance < 20) {
+                e.preventDefault();
+                handler();
+            }
+        });
+    
+        // Keep click handler for desktop
+        element.addEventListener('click', (e) => {
+            // Only handle click if it's not a touch device or if it's a mouse click
+            if (!('ontouchstart' in window) || e.pointerType === 'mouse') {
+                handler();
+            }
+        });
+    }
+    // Update handleCellClick to be more responsive
     handleCellClick(cell) {
-        if (!this.isGameActive || this.board[cell.dataset.index] !== '') return;
+        const index = cell.dataset.index;
+        if (!this.isGameActive || this.board[index] !== '') return;
 
-        this.makeMove(cell.dataset.index);
+        // Immediate visual feedback
+        cell.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            cell.style.transform = 'scale(1)';
+        }, 100);
+
+        this.makeMove(index);
 
         if (this.gameMode === 'ai' && this.isGameActive) {
-            setTimeout(() => this.makeAIMove(), 500);
+            // Reduced delay for AI move
+            setTimeout(() => this.makeAIMove(), 300);
         }
     }
 
@@ -99,12 +151,11 @@ class TicTacToe {
         const cell = this.cells[index];
         cell.setAttribute('data-symbol', this.currentPlayer);
         
-        // Remove any existing animation class
-        cell.style.animation = 'none';
-        cell.offsetHeight; // Trigger reflow
-        cell.style.animation = null;
-    
+        // Add pop-in animation
+        cell.style.animation = 'symbolAppear 0.3s ease-out';
+        
         if (this.checkWin()) {
+            this.winningCombination = this.getWinningCombination();
             this.handleWin();
             return;
         }
@@ -115,6 +166,21 @@ class TicTacToe {
         }
     
         this.switchPlayer();
+    }
+    
+    getWinningCombination() {
+        const winPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+            [0, 4, 8], [2, 4, 6] // Diagonals
+        ];
+    
+        for (let pattern of winPatterns) {
+            if (pattern.every(index => this.board[index] === this.currentPlayer)) {
+                return pattern;
+            }
+        }
+        return null;
     }
     
 
@@ -227,11 +293,24 @@ class TicTacToe {
 
     handleWin() {
         this.isGameActive = false;
+        
+        // Animate winning cells
+        if (this.winningCombination) {
+            this.winningCombination.forEach(index => {
+                const cell = this.cells[index];
+                cell.classList.add('winner');
+            });
+        }
+    
+        // Create confetti effect
+        this.createConfetti();
+    
+        // Show winning modal with delay
         setTimeout(() => {
             this.showModal('🎉 Winner!', `Player ${this.currentPlayer} wins!`);
-        }, 1000);
+        }, 1500);
     }
-
+    
     handleDraw() {
         this.isGameActive = false;
         this.showModal('🤝 Draw!', "It's a draw!");
@@ -261,8 +340,23 @@ class TicTacToe {
 
     switchPlayer() {
         this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
-        this.updateTurnIndicator();
+        this.playerIndicator.textContent = `Player ${this.currentPlayer}'s Turn`;
+        
+        // Add animation class
+        this.playerIndicator.parentElement.classList.add('animate');
+        
+        // Remove animation class after animation completes
+        setTimeout(() => {
+            this.playerIndicator.parentElement.classList.remove('animate');
+        }, 500);
+    
+        // Update turn line
+        this.turnLine.style.width = '0';
+        setTimeout(() => {
+            this.turnLine.style.width = '100%';
+        }, 50);
     }
+    
 
     updateTurnIndicator() {
         this.playerIndicator.textContent = `Player ${this.currentPlayer}'s Turn`;
@@ -286,30 +380,25 @@ class TicTacToe {
     resetGame() {
         if (!this.gameStarted) return;
         
-        // Reset the board array
         this.board = Array(9).fill('');
         this.currentPlayer = 'X';
         this.isGameActive = true;
+        this.winningCombination = null;
         
-        // Clear all cells
         this.cells.forEach(cell => {
             cell.removeAttribute('data-symbol');
             cell.removeAttribute('data-hover');
+            cell.classList.remove('winner');
             cell.style.animation = 'none';
             cell.offsetHeight; // Trigger reflow
             cell.style.animation = null;
         });
         
-        // Reset visual elements
         this.winLine.style.opacity = '0';
         this.modal.classList.add('hidden');
         this.updateTurnIndicator();
-    
-        // If it's AI mode and AI goes first (O), make AI move
-        if (this.gameMode === 'ai' && this.currentPlayer === 'O') {
-            setTimeout(() => this.makeAIMove(), 500);
-        }
     }
+    
     restartGame() {
         this.resetGame();
         this.isGameActive = true;
@@ -319,6 +408,25 @@ class TicTacToe {
         this.modal.classList.add('hidden');
     }
     
+    createConfetti() {
+        const colors = ['#FFD700', '#FFA500', '#FF8C00', '#FF6347', '#4CAF50', '#3498db'];
+        const container = document.createElement('div');
+        container.className = 'confetti-container';
+        document.body.appendChild(container);
+    
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDelay = Math.random() * 2 + 's';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            container.appendChild(confetti);
+        }
+    
+        setTimeout(() => {
+            document.body.removeChild(container);
+        }, 3000);
+    }
     
 }
 
