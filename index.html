@@ -3,29 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cross Zero Game</title>
+    <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Cross Zero Game</h1>
-        
+        <div class="game-title">
+            <h1>Tic Tac Toe</h1>
+            <div class="title-decoration"></div>
+        </div>
+
         <div class="game-mode">
-            <button id="twoPlayer">2 Players</button>
-            <button id="multiplayer">Multiplayer</button>
+            <button id="twoPlayer" class="neon-button">
+                <span class="button-content">2 Players</span>
+            </button>
+            <button id="multiplayer" class="neon-button">
+                <span class="button-content">vs AI</span>
+            </button>
         </div>
 
         <div class="difficulty-selector hidden">
-            <h2>Select Difficulty</h2>
-            <button data-difficulty="easy">Easy</button>
-            <button data-difficulty="medium">Medium</button>
-            <button data-difficulty="hard">Hard</button>
+            <h2>Select AI Difficulty</h2>
+            <div class="difficulty-buttons">
+                <button data-difficulty="easy" class="difficulty-btn easy">
+                    <span>Easy</span>
+                </button>
+                <button data-difficulty="medium" class="difficulty-btn medium">
+                    <span>Medium</span>
+                </button>
+                <button data-difficulty="hard" class="difficulty-btn hard">
+                    <span>Hard</span>
+                </button>
+            </div>
         </div>
 
         <div class="game-board hidden">
             <div class="player-turn">
-                <span id="current-player">Player X's Turn</span>
+                <div class="player-indicator">
+                    <span id="current-player">Player X's Turn</span>
+                    <div class="turn-indicator"></div>
+                </div>
             </div>
+            
             <div class="board">
                 <div class="cell" data-index="0"></div>
                 <div class="cell" data-index="1"></div>
@@ -36,13 +56,30 @@
                 <div class="cell" data-index="6"></div>
                 <div class="cell" data-index="7"></div>
                 <div class="cell" data-index="8"></div>
+                <div class="win-line"></div>
             </div>
-            <button id="reset-game">Reset Game</button>
+
+            <button id="reset-game" class="reset-button">
+                <span>Reset Game</span>
+            </button>
+        </div>
+
+        <!-- Custom Modal -->
+        <div class="custom-modal hidden">
+            <div class="modal-content">
+                <h2 id="modal-title"></h2>
+                <p id="modal-message"></p>
+                <button id="modal-button" class="neon-button">
+                    <span class="button-content">Play Again</span>
+                </button>
+            </div>
         </div>
     </div>
     
     <footer>
-        <p>Made with ❤️ by Vansh Sharma</p>
+        <div class="footer-content">
+            <p>Made with <span class="heart">❤️</span> by Vansh Sharma</p>
+        </div>
     </footer>
 
     <script src="js/script.js"></script>

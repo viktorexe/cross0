@@ -2,7 +2,11 @@
     --primary-color: #2c3e50;
     --secondary-color: #3498db;
     --accent-color: #e74c3c;
-    --background-color: #ecf0f1;
+    --background-color: #1a1a1a;
+    --cell-color: #2c2c2c;
+    --text-color: #ffffff;
+    --neon-color: #00ff9d;
+    --winner-color: #4CAF50;
 }
 
 * {
@@ -12,11 +16,12 @@
 }
 
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background-color: var(--background-color);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    color: var(--text-color);
 }
 
 .container {
@@ -26,30 +31,97 @@ body {
     text-align: center;
 }
 
-h1 {
-    color: var(--primary-color);
-    margin-bottom: 2rem;
+.game-title {
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.game-title h1 {
+    font-size: 3rem;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px var(--neon-color),
+                 0 0 20px var(--neon-color),
+                 0 0 30px var(--neon-color);
+}
+
+.title-decoration {
+    height: 4px;
+    width: 100px;
+    background: var(--neon-color);
+    margin: 0 auto;
+    position: relative;
+    border-radius: 2px;
+    box-shadow: 0 0 10px var(--neon-color);
 }
 
 .game-mode {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
     margin-bottom: 2rem;
 }
 
-button {
+.neon-button {
     padding: 1rem 2rem;
-    margin: 0.5rem;
     font-size: 1.1rem;
-    border: none;
+    border: 2px solid var(--neon-color);
     border-radius: 5px;
-    background-color: var(--secondary-color);
-    color: white;
+    background: transparent;
+    color: var(--neon-color);
     cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
-button:hover {
-    transform: scale(1.05);
-    background-color: #2980b9;
+.neon-button:hover {
+    background: var(--neon-color);
+    color: var(--background-color);
+    box-shadow: 0 0 20px var(--neon-color);
+}
+
+.difficulty-selector {
+    margin: 2rem 0;
+}
+
+.difficulty-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.difficulty-btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.difficulty-btn.easy {
+    background: #4CAF50;
+}
+
+.difficulty-btn.medium {
+    background: #FF9800;
+}
+
+.difficulty-btn.hard {
+    background: #f44336;
+}
+
+.difficulty-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .board {
@@ -58,28 +130,69 @@ button:hover {
     gap: 10px;
     margin: 2rem auto;
     max-width: 400px;
+    position: relative;
 }
 
 .cell {
     aspect-ratio: 1;
-    background-color: white;
+    background-color: var(--cell-color);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 3rem;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
+    color: var(--text-color);
+    position: relative;
+    overflow: hidden;
 }
 
 .cell:hover {
-    background-color: #e8e8e8;
+    background-color: #3c3c3c;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.cell.winner {
+    background-color: var(--winner-color);
+    animation: winPulse 1s infinite;
+}
+
+@keyframes winPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
 
 .player-turn {
     font-size: 1.5rem;
     margin: 1rem 0;
-    color: var(--primary-color);
+    color: var(--text-color);
+}
+
+.player-indicator {
+    display: inline-block;
+    position: relative;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    background: rgba(255,255,255,0.1);
+}
+
+.turn-indicator {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    height: 2px;
+    background: var(--neon-color);
+    width: 100%;
+    transform-origin: left;
+    animation: turnProgress 3s linear infinite;
+}
+
+@keyframes turnProgress {
+    0% { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
 }
 
 .hidden {
@@ -96,26 +209,109 @@ button:hover {
     100% { transform: scale(1) rotate(360deg); }
 }
 
+.custom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--cell-color);
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+    animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.win-line {
+    position: absolute;
+    background: var(--neon-color);
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
 footer {
     margin-top: auto;
     padding: 1rem;
     text-align: center;
-    background-color: var(--primary-color);
-    color: white;
+    background: rgba(255,255,255,0.05);
 }
 
-footer p {
-    font-size: 1rem;
+.footer-content {
+    position: relative;
+    display: inline-block;
 }
 
-.difficulty-selector {
-    margin: 2rem 0;
+.heart {
+    display: inline-block;
+    animation: heartbeat 1.5s infinite;
 }
 
-.difficulty-selector button {
-    background-color: var(--accent-color);
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
 }
 
-.difficulty-selector button:hover {
-    background-color: #c0392b;
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .game-title h1 {
+        font-size: 2rem;
+    }
+
+    .game-mode {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .board {
+        max-width: 300px;
+    }
+
+    .cell {
+        font-size: 2rem;
+    }
+
+    .difficulty-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Animations for X and O */
+.cell[data-symbol="X"]::before {
+    content: "X";
+    animation: symbolAppear 0.3s ease-out;
+}
+
+.cell[data-symbol="O"]::before {
+    content: "O";
+    animation: symbolAppear 0.3s ease-out;
+}
+
+@keyframes symbolAppear {
+    from {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
 }
