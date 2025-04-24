@@ -160,6 +160,7 @@ body {
     font-size: 2.5rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 .cell:hover {
@@ -167,12 +168,21 @@ body {
     box-shadow: 0 4px 15px var(--shadow-color);
 }
 
-.cell[data-symbol="X"] {
+/* X and O Styles */
+.cell[data-symbol="X"]::before {
+    content: "X";
     color: var(--primary-color);
+    font-size: 3.5rem;
+    font-weight: bold;
+    animation: symbolAppear 0.3s ease-out;
 }
 
-.cell[data-symbol="O"] {
+.cell[data-symbol="O"]::before {
+    content: "O";
     color: var(--accent-color);
+    font-size: 3.5rem;
+    font-weight: bold;
+    animation: symbolAppear 0.3s ease-out;
 }
 
 .win-line {
@@ -250,7 +260,6 @@ footer {
         opacity: 1;
     }
 }
-
 /* Mobile Responsiveness */
 @media (max-width: 600px) {
     .container {
