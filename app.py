@@ -6,5 +6,11 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# This is important for Vercel
+@app.route('/<path:path>')
+def catch_all(path):
+    return render_template('index.html')
+
+# Change this to handle Vercel's serverless function format
+def handler(request):
+    return app

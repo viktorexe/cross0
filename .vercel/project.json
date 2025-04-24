@@ -1,0 +1,5 @@
+{
+    "buildCommand": "",
+    "devCommand": "python app.py",
+    "framework": null
+}
