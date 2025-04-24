@@ -305,6 +305,293 @@ class TicTacToe {
             }, 500);
         });
     }
+    createFireworks() {
+        const colors = ['#FFD700', '#FFA500', '#FF8C00', '#FF6347', '#4CAF50', '#3498db'];
+        const fireworksContainer = document.createElement('div');
+        fireworksContainer.className = 'fireworks-container';
+        document.body.appendChild(fireworksContainer);
+    
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                firework.style.setProperty('--x', `${Math.random() * 100}vw`);
+                firework.style.setProperty('--initialY', '100vh');
+                firework.style.setProperty('--finalY', `${Math.random() * 50}vh`);
+                firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                fireworksContainer.appendChild(firework);
+            }, i * 50);
+        }
+    
+        setTimeout(() => {
+            document.body.removeChild(fireworksContainer);
+        }, 3000);
+    }
+    
+    createStarBurst(x, y) {
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.left = x + 'px';
+        container.style.top = y + 'px';
+        container.style.pointerEvents = 'none';
+        document.body.appendChild(container);
+    
+        for (let i = 0; i < 12; i++) {
+            const star = document.createElement('div');
+            star.className = 'star-burst';
+            star.style.transform = `rotate(${i * 30}deg)`;
+            container.appendChild(star);
+        }
+    
+        setTimeout(() => {
+            document.body.removeChild(container);
+        }, 1000);
+    }
+    
+    showTrophy() {
+        const trophy = document.createElement('div');
+        trophy.className = 'trophy';
+        trophy.textContent = '🏆';
+        document.body.appendChild(trophy);
+    
+        setTimeout(() => {
+            document.body.removeChild(trophy);
+        }, 2000);
+    }
+    
+    handleWin() {
+        this.isGameActive = false;
+        
+        // Animate winning cells with delay
+        if (this.winningCombination) {
+            this.winningCombination.forEach((index, i) => {
+                setTimeout(() => {
+                    const cell = this.cells[index];
+                    cell.classList.add('winner');
+                    
+                    // Create star burst effect at cell position
+                    const rect = cell.getBoundingClientRect();
+                    this.createStarBurst(
+                        rect.left + rect.width / 2,
+                        rect.top + rect.height / 2
+                    );
+                }, i * 200);
+            });
+        }
+    
+        // Create multiple effects
+        setTimeout(() => {
+            this.createFireworks();
+            this.showTrophy();
+        }, 500);
+    
+        // Show winning modal with delay
+        setTimeout(() => {
+            this.showModal('🎉 Winner!', `Player ${this.currentPlayer} wins!`);
+        }, 2000);
+    }
+    
+    showModal(title, message) {
+        if (!this.gameStarted) return;
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <button class="premium-button">
+                    <span>Play Again</span>
+                </button>
+            </div>
+        `;
+        
+        // Add animation classes
+        modal.classList.add('modal-animate');
+        
+        document.body.appendChild(modal);
+        
+        const button = modal.querySelector('button');
+        button.addEventListener('click', () => {
+            modal.classList.add('modal-exit');
+            setTimeout(() => {
+                document.body.removeChild(modal);
+                this.resetGame();
+            }, 500);
+        });
+    }
+createFireworks() {
+    const colors = ['#FFD700', '#FFA500', '#FF8C00', '#FF6347', '#4CAF50', '#3498db'];
+    const fireworksContainer = document.createElement('div');
+    fireworksContainer.className = 'fireworks-container';
+    document.body.appendChild(fireworksContainer);
+
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.setProperty('--x', `${Math.random() * 100}vw`);
+            firework.style.setProperty('--initialY', '100vh');
+            firework.style.setProperty('--finalY', `${Math.random() * 50}vh`);
+            firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            fireworksContainer.appendChild(firework);
+        }, i * 50);
+    }
+
+    setTimeout(() => {
+        document.body.removeChild(fireworksContainer);
+    }, 3000);
+}
+
+createStarBurst(x, y) {
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.left = x + 'px';
+    container.style.top = y + 'px';
+    container.style.pointerEvents = 'none';
+    document.body.appendChild(container);
+
+    for (let i = 0; i < 12; i++) {
+        const star = document.createElement('div');
+        star.className = 'star-burst';
+        star.style.transform = `rotate(${i * 30}deg)`;
+        container.appendChild(star);
+    }
+
+    setTimeout(() => {
+        document.body.removeChild(container);
+    }, 1000);
+}
+
+showTrophy() {
+    const trophy = document.createElement('div');
+    trophy.className = 'trophy';
+    trophy.textContent = '🏆';
+    document.body.appendChild(trophy);
+
+    setTimeout(() => {
+        document.body.removeChild(trophy);
+    }, 2000);
+}
+
+handleWin() {
+    this.isGameActive = false;
+    
+    // Animate winning cells with delay
+    if (this.winningCombination) {
+        this.winningCombination.forEach((index, i) => {
+            setTimeout(() => {
+                const cell = this.cells[index];
+                cell.classList.add('winner');
+                
+                // Create star burst effect at cell position
+                const rect = cell.getBoundingClientRect();
+                this.createStarBurst(
+                    rect.left + rect.width / 2,
+                    rect.top + rect.height / 2
+                );
+            }, i * 200);
+        });
+    }
+
+    // Create multiple effects
+    setTimeout(() => {
+        this.createFireworks();
+        this.showTrophy();
+    }, 500);
+
+    // Show winning modal with delay
+    setTimeout(() => {
+        this.showModal('🎉 Winner!', `Player ${this.currentPlayer} wins!`);
+    }, 2000);
+}
+createConfetti() {
+    const confettiContainer = document.createElement('div');
+    confettiContainer.style.position = 'fixed';
+    confettiContainer.style.top = '0';
+    confettiContainer.style.left = '0';
+    confettiContainer.style.width = '100%';
+    confettiContainer.style.height = '100%';
+    confettiContainer.style.pointerEvents = 'none';
+    confettiContainer.style.zIndex = '1000';
+    document.body.appendChild(confettiContainer);
+
+    const colors = [
+        '#ffd700', // Gold
+        '#FFA500', // Orange
+        '#FF6347', // Tomato
+        '#4CAF50', // Green
+        '#3498db', // Blue
+        '#9b59b6'  // Purple
+    ];
+
+    const confettiPieces = 150; // Number of confetti pieces
+    const confettiElements = [];
+
+    for (let i = 0; i < confettiPieces; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        
+        // Randomize confetti properties
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const leftPosition = Math.random() * 100;
+        const width = Math.random() * 8 + 6;
+        const height = width * 1.5;
+        const delay = Math.random() * 3;
+        const duration = Math.random() * 2 + 3;
+        const rotationDirection = Math.random() < 0.5 ? -1 : 1;
+
+        // Apply styles
+        Object.assign(confetti.style, {
+            left: `${leftPosition}%`,
+            width: `${width}px`,
+            height: `${height}px`,
+            backgroundColor: color,
+            transform: `rotate(${Math.random() * 360}deg)`,
+            animation: `confettiDrop ${duration}s ${delay}s ease-in forwards`,
+            boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+            borderRadius: '1px'
+        });
+
+        confettiContainer.appendChild(confetti);
+        confettiElements.push(confetti);
+    }
+
+    // Clean up confetti after animation
+    setTimeout(() => {
+        document.body.removeChild(confettiContainer);
+    }, 6000);
+}
+
+showModal(title, message) {
+    if (!this.gameStarted) return;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>${title}</h2>
+            <p>${message}</p>
+            <button class="premium-button">
+                <span>Play Again</span>
+            </button>
+        </div>
+    `;
+    
+    // Add animation classes
+    modal.classList.add('modal-animate');
+    
+    document.body.appendChild(modal);
+    
+    const button = modal.querySelector('button');
+    button.addEventListener('click', () => {
+        modal.classList.add('modal-exit');
+        setTimeout(() => {
+            document.body.removeChild(modal);
+            this.resetGame();
+        }, 500);
+    });
+}
     
     getBestMove() {
         switch(this.difficulty) {
@@ -408,23 +695,30 @@ class TicTacToe {
 
     handleWin() {
         this.isGameActive = false;
-        
-        // Animate winning cells
+    
+        // First, draw the win line
         if (this.winningCombination) {
-            this.winningCombination.forEach(index => {
-                const cell = this.cells[index];
-                cell.classList.add('winner');
+            this.drawWinLine(this.winningCombination);
+            
+            // Animate winning cells
+            this.winningCombination.forEach((index, i) => {
+                setTimeout(() => {
+                    this.cells[index].classList.add('winner');
+                }, i * 200);
             });
         }
     
-        // Create confetti effect
-        this.createConfetti();
+        // Start confetti after a short delay
+        setTimeout(() => {
+            this.createConfetti();
+        }, 300);
     
-        // Show winning modal with delay
+        // Show the winning modal
         setTimeout(() => {
             this.showModal('🎉 Winner!', `Player ${this.currentPlayer} wins!`);
         }, 1500);
     }
+    
     
     handleDraw() {
         this.isGameActive = false;
@@ -432,26 +726,34 @@ class TicTacToe {
     }
 
     drawWinLine(pattern) {
+        const board = document.querySelector('.board');
+        const boardRect = board.getBoundingClientRect();
         const cell1 = this.cells[pattern[0]].getBoundingClientRect();
         const cell2 = this.cells[pattern[2]].getBoundingClientRect();
-        const board = document.querySelector('.board').getBoundingClientRect();
-
-        const angle = Math.atan2(
-            cell2.top - cell1.top,
-            cell2.left - cell1.left
-        ) * 180 / Math.PI;
-
-        const length = Math.sqrt(
-            Math.pow(cell2.left - cell1.left, 2) + 
-            Math.pow(cell2.top - cell1.top, 2)
-        );
-
-        this.winLine.style.width = `${length}px`;
-        this.winLine.style.left = `${cell1.left - board.left + cell1.width/2}px`;
-        this.winLine.style.top = `${cell1.top - board.top + cell1.height/2}px`;
-        this.winLine.style.transform = `rotate(${angle}deg)`;
-        this.winLine.style.opacity = '1';
+    
+        const x1 = cell1.left + cell1.width / 2 - boardRect.left;
+        const y1 = cell1.top + cell1.height / 2 - boardRect.top;
+        const x2 = cell2.left + cell2.width / 2 - boardRect.left;
+        const y2 = cell2.top + cell2.height / 2 - boardRect.top;
+    
+        const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+    
+        const winLine = document.querySelector('.win-line');
+        Object.assign(winLine.style, {
+            width: `${length}px`,
+            left: `${x1}px`,
+            top: `${y1}px`,
+            transform: `rotate(${angle}deg)`,
+            transformOrigin: '0 50%'
+        });
+    
+        // Animate the line
+        setTimeout(() => {
+            winLine.classList.add('active');
+        }, 100);
     }
+    
 
     switchPlayer() {
         this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
