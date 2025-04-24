@@ -1,14 +1,11 @@
 :root {
-    --primary-color: #1a1a1a;
-    --secondary-color: #3949ab;
-    --accent-color: #gold;
+    --primary-color: #2c3e50;
+    --accent-color: #3498db;
     --background-color: #ffffff;
-    --cell-color: #f8f9fa;
     --text-color: #2c3e50;
-    --border-color: #e1e1e1;
-    --gold-color: #FFD700;
-    --winner-color: #4CAF50;
+    --border-color: #e0e0e0;
     --shadow-color: rgba(0, 0, 0, 0.1);
+    --gold: #ffd700;
 }
 
 * {
@@ -20,10 +17,10 @@
 body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--background-color);
+    color: var(--text-color);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    color: var(--text-color);
 }
 
 .container {
@@ -35,219 +32,187 @@ body {
 
 .game-title {
     margin-bottom: 3rem;
-    position: relative;
 }
 
 .game-title h1 {
     font-size: 3.5rem;
-    color: var(--text-color);
-    text-transform: uppercase;
-    letter-spacing: 3px;
+    color: var(--primary-color);
     margin-bottom: 1rem;
     font-weight: 600;
-    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 .title-decoration {
-    height: 4px;
     width: 100px;
-    background: linear-gradient(90deg, var(--gold-color), #FFA500);
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-color), var(--accent-color));
     margin: 0 auto;
-    position: relative;
     border-radius: 2px;
 }
 
-.game-mode {
+.game-selection {
     display: flex;
     gap: 2rem;
     justify-content: center;
     margin-bottom: 2rem;
 }
 
-.neon-button {
+.premium-button {
     padding: 1rem 2rem;
     font-size: 1.1rem;
-    border: 2px solid var(--secondary-color);
-    border-radius: 10px;
     background: white;
-    color: var(--secondary-color);
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    border-radius: 10px;
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s;
-    text-transform: uppercase;
-    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
     box-shadow: 0 4px 15px var(--shadow-color);
 }
 
-.neon-button:hover {
-    background: var(--secondary-color);
+.premium-button:hover {
+    background: var(--primary-color);
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(57, 73, 171, 0.3);
+    box-shadow: 0 6px 20px var(--shadow-color);
 }
 
-.difficulty-selector {
+.difficulty-select {
     margin: 2rem 0;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.5s ease;
 }
 
-.difficulty-selector.show {
-    opacity: 1;
-    transform: translateY(0);
+.difficulty-select h2 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
 }
 
 .difficulty-buttons {
     display: flex;
     gap: 1rem;
     justify-content: center;
-    margin-top: 1rem;
 }
 
 .difficulty-btn {
     padding: 0.8rem 1.5rem;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     color: white;
     cursor: pointer;
-    transition: all 0.3s;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.difficulty-btn.easy { background: #4CAF50; }
+.difficulty-btn.medium { background: #FF9800; }
+.difficulty-btn.hard { background: #f44336; }
+
+.difficulty-btn:hover {
+    transform: translateY(-2px);
     box-shadow: 0 4px 15px var(--shadow-color);
 }
 
-.difficulty-btn.easy {
-    background: linear-gradient(135deg, #4CAF50, #8BC34A);
+.game-board {
+    margin: 2rem auto;
+    max-width: 400px;
 }
 
-.difficulty-btn.medium {
-    background: linear-gradient(135deg, #FF9800, #FFC107);
+.status-bar {
+    margin-bottom: 2rem;
 }
 
-.difficulty-btn.hard {
-    background: linear-gradient(135deg, #f44336, #FF5722);
+.player-turn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    position: relative;
 }
 
-.difficulty-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px var(--shadow-color);
+.turn-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--accent-color);
+    width: 0;
+    transition: width 0.3s ease;
 }
 
 .board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
-    margin: 2rem auto;
-    max-width: 400px;
-    position: relative;
-    padding: 15px;
     background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px var(--shadow-color);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px var(--shadow-color);
+    position: relative;
 }
 
 .cell {
     aspect-ratio: 1;
-    background-color: var(--cell-color);
-    border-radius: 15px;
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
+    font-size: 2.5rem;
     cursor: pointer;
-    transition: all 0.3s;
-    color: var(--text-color);
-    position: relative;
-    overflow: hidden;
-    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
 }
 
 .cell:hover {
-    background-color: #f1f3f5;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px var(--shadow-color);
-}
-
-.cell.winner {
-    background: linear-gradient(135deg, #4CAF50, #8BC34A);
-    color: white;
-    animation: winPulse 1s infinite;
-}
-
-.player-turn {
-    font-size: 1.5rem;
-    margin: 1rem 0;
-    color: var(--text-color);
-}
-
-.player-indicator {
-    display: inline-block;
-    position: relative;
-    padding: 1rem 2rem;
-    border-radius: 10px;
-    background: white;
     box-shadow: 0 4px 15px var(--shadow-color);
 }
 
-.turn-indicator {
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--secondary-color), #6f74dd);
-    width: 100%;
-    transform-origin: left;
-    animation: turnProgress 3s linear infinite;
-    border-radius: 3px;
+.cell[data-symbol="X"] {
+    color: var(--primary-color);
 }
 
-.custom-modal {
+.cell[data-symbol="O"] {
+    color: var(--accent-color);
+}
+
+.win-line {
+    position: absolute;
+    background: var(--accent-color);
+    height: 4px;
+    border-radius: 2px;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.9);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
     backdrop-filter: blur(5px);
 }
 
 .modal-content {
     background: white;
     padding: 3rem;
-    border-radius: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px var(--shadow-color);
     text-align: center;
-    animation: modalAppear 0.3s ease-out;
-    box-shadow: 0 10px 40px var(--shadow-color);
-    min-width: 300px;
 }
 
 .modal-content h2 {
-    color: var(--text-color);
-    font-size: 2rem;
     margin-bottom: 1rem;
+    color: var(--primary-color);
 }
 
 .modal-content p {
-    color: #666;
     margin-bottom: 2rem;
-}
-
-.win-line {
-    position: absolute;
-    background: linear-gradient(90deg, var(--secondary-color), #6f74dd);
-    transition: all 0.3s ease;
-    z-index: 1;
-    height: 5px;
-    border-radius: 3px;
-    opacity: 0;
+    color: var(--text-color);
 }
 
 footer {
@@ -258,52 +223,17 @@ footer {
     box-shadow: 0 -4px 15px var(--shadow-color);
 }
 
-.footer-content {
-    position: relative;
-    display: inline-block;
-    color: var(--text-color);
-    font-weight: 500;
-}
-
 .heart {
-    display: inline-block;
     color: #e74c3c;
+    display: inline-block;
     animation: heartbeat 1.5s infinite;
 }
 
-.toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: white;
-    color: var(--text-color);
-    padding: 1rem 2rem;
-    border-radius: 10px;
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: all 0.3s ease;
-    z-index: 1000;
-    box-shadow: 0 4px 15px var(--shadow-color);
-    border-left: 4px solid var(--secondary-color);
+.hidden {
+    display: none !important;
 }
 
 /* Animations */
-@keyframes winPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-@keyframes turnProgress {
-    0% { transform: scaleX(0); }
-    100% { transform: scaleX(1); }
-}
-
-@keyframes modalAppear {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
 @keyframes heartbeat {
     0% { transform: scale(1); }
     50% { transform: scale(1.2); }
@@ -311,12 +241,12 @@ footer {
 }
 
 @keyframes symbolAppear {
-    from {
-        transform: scale(0) rotate(-180deg);
+    from { 
+        transform: scale(0.5);
         opacity: 0;
     }
-    to {
-        transform: scale(1) rotate(0);
+    to { 
+        transform: scale(1);
         opacity: 1;
     }
 }
@@ -328,21 +258,12 @@ footer {
     }
 
     .game-title h1 {
-        font-size: 2rem;
+        font-size: 2.5rem;
     }
 
-    .game-mode {
+    .game-selection {
         flex-direction: column;
         gap: 1rem;
-    }
-
-    .board {
-        max-width: 300px;
-        gap: 10px;
-    }
-
-    .cell {
-        font-size: 2rem;
     }
 
     .difficulty-buttons {
@@ -350,29 +271,11 @@ footer {
         gap: 0.5rem;
     }
 
-    .modal-content {
-        margin: 1rem;
-        padding: 2rem;
+    .board {
+        gap: 10px;
     }
-}
 
-/* Cell Symbols */
-.cell[data-symbol="X"]::before {
-    content: "×";
-    font-size: 4rem;
-    font-weight: bold;
-    background: linear-gradient(135deg, #2c3e50, #3498db);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: symbolAppear 0.3s ease-out;
-}
-
-.cell[data-symbol="O"]::before {
-    content: "○";
-    font-size: 3rem;
-    font-weight: bold;
-    background: linear-gradient(135deg, #e74c3c, #f39c12);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: symbolAppear 0.3s ease-out;
+    .cell {
+        font-size: 2rem;
+    }
 }

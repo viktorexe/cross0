@@ -1,141 +1,95 @@
 class TicTacToe {
     constructor() {
+        this.initialize();
+        this.setupEventListeners();
+    }
+
+    initialize() {
         this.board = Array(9).fill('');
         this.currentPlayer = 'X';
         this.gameMode = null;
         this.difficulty = null;
         this.isGameActive = false;
-        this.winningCombination = null;
-        this.isAnimating = false;
-        this.gameStarted = false;  // Add this line
-    
-        this.initializeElements();
-        this.setupEventListeners();
-        this.setupModalEvents();
-    }
+        this.gameStarted = false;
 
-    initializeElements() {
+        // DOM Elements
         this.cells = document.querySelectorAll('.cell');
-        this.playerTurn = document.getElementById('current-player');
-        this.gameBoard = document.querySelector('.game-board');
-        this.difficultySelector = document.querySelector('.difficulty-selector');
-        this.resetButton = document.getElementById('reset-game');
-        this.twoPlayerBtn = document.getElementById('twoPlayer');
-        this.multiplayerBtn = document.getElementById('multiplayer');
-        this.modal = document.querySelector('.custom-modal');
-        this.modalTitle = document.getElementById('modal-title');
-        this.modalMessage = document.getElementById('modal-message');
-        this.modalButton = document.getElementById('modal-button');
+        this.playerIndicator = document.getElementById('playerIndicator');
+        this.gameBoard = document.getElementById('gameBoard');
+        this.difficultySelect = document.getElementById('difficultySelect');
+        this.resetButton = document.getElementById('resetGame');
+        this.modal = document.getElementById('gameModal');
+        this.modalTitle = document.getElementById('modalTitle');
+        this.modalMessage = document.getElementById('modalMessage');
+        this.modalButton = document.getElementById('modalButton');
+        this.turnLine = document.querySelector('.turn-line');
         this.winLine = document.querySelector('.win-line');
     }
 
     setupEventListeners() {
+        document.getElementById('twoPlayer').addEventListener('click', () => this.startTwoPlayerGame());
+        document.getElementById('vsAI').addEventListener('click', () => this.startAIGame());
+        
+        document.querySelectorAll('.difficulty-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                this.difficulty = button.dataset.difficulty;
+                this.startGame();
+                this.difficultySelect.classList.add('hidden');
+            });
+        });
+
         this.cells.forEach(cell => {
             cell.addEventListener('click', () => this.handleCellClick(cell));
         });
 
         this.resetButton.addEventListener('click', () => this.resetGame());
-        this.twoPlayerBtn.addEventListener('click', () => this.startTwoPlayerGame());
-        this.multiplayerBtn.addEventListener('click', () => this.startMultiplayerGame());
-
-        document.querySelectorAll('.difficulty-selector button').forEach(button => {
-            button.addEventListener('click', () => {
-                this.difficulty = button.dataset.difficulty;
-                this.startGame();
-                
-                // Remove active class from all buttons
-                document.querySelectorAll('.difficulty-selector button')
-                    .forEach(btn => btn.classList.remove('active'));
-                // Add active class to clicked button
-                button.classList.add('active');
-            });
-        });
-    }
-
-    setupModalEvents() {
         this.modalButton.addEventListener('click', () => {
             this.modal.classList.add('hidden');
             this.resetGame();
         });
-
-        // Close modal when clicking outside
-        this.modal.addEventListener('click', (e) => {
-            if (e.target === this.modal) {
-                this.modal.classList.add('hidden');
-                this.resetGame();
-            }
-        });
     }
+
     startTwoPlayerGame() {
         this.gameMode = '2player';
-        this.difficultySelector.classList.add('hidden');
         this.startGame();
-        this.showToast('2 Player Mode Started!');
     }
 
-    startMultiplayerGame() {
+    startAIGame() {
         this.gameMode = 'ai';
-        this.difficultySelector.classList.remove('hidden');
-        this.showToast('Select AI Difficulty');
+        this.difficultySelect.classList.remove('hidden');
     }
 
     startGame() {
-        if (!this.gameStarted) {
-            this.gameStarted = true;
-            this.gameBoard.classList.remove('hidden');
-            this.isGameActive = true;
-            this.resetGame();
-        }
+        this.gameStarted = true;
+        this.isGameActive = true;
+        this.gameBoard.classList.remove('hidden');
+        this.resetButton.classList.remove('hidden');
+        this.resetGame();
+        this.updateTurnIndicator();
     }
 
     handleCellClick(cell) {
-        const index = cell.dataset.index;
-        if (this.board[index] || !this.isGameActive || this.isAnimating) return;
+        if (!this.isGameActive || this.board[cell.dataset.index] !== '') return;
 
-        this.makeMove(index);
+        this.makeMove(cell.dataset.index);
 
         if (this.gameMode === 'ai' && this.isGameActive) {
-            this.isAnimating = true;
-            setTimeout(() => {
-                this.makeAIMove();
-                this.isAnimating = false;
-            }, 500);
+            setTimeout(() => this.makeAIMove(), 500);
         }
     }
 
-    showToast(message) {
-        const toast = document.createElement('div');
-        toast.classList.add('toast');
-        toast.textContent = message;
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 2000);
-        }, 100);
-    }
     makeMove(index) {
         this.board[index] = this.currentPlayer;
-        const cell = this.cells[index];
-        cell.setAttribute('data-symbol', this.currentPlayer);
-        
+        this.cells[index].dataset.symbol = this.currentPlayer;
+        this.cells[index].style.animation = 'symbolAppear 0.3s ease-out';
+
         if (this.checkWin()) {
-            this.animateWin();
-            setTimeout(() => {
-                this.showModal('🎉 Winner!', `Player ${this.currentPlayer} wins!`);
-            }, 1000);
-            this.isGameActive = false;
+            this.handleWin();
             return;
         }
 
         if (this.checkDraw()) {
-            this.showModal('🤝 Draw!', "It's a draw!");
-            this.isGameActive = false;
+            this.handleDraw();
             return;
         }
 
@@ -143,32 +97,38 @@ class TicTacToe {
     }
 
     makeAIMove() {
-        let index;
-        switch(this.difficulty) {
-            case 'easy':
-                index = this.getRandomEmptyCell();
-                break;
-            case 'medium':
-                index = Math.random() < 0.5 ? this.getBestMove() : this.getRandomEmptyCell();
-                break;
-            case 'hard':
-                index = this.getBestMove();
-                break;
-            default:
-                index = this.getRandomEmptyCell();
-        }
-
+        const index = this.getBestMove();
         if (index !== null) {
             this.makeMove(index);
         }
     }
 
     getBestMove() {
+        switch(this.difficulty) {
+            case 'easy':
+                return this.getRandomMove();
+            case 'medium':
+                return Math.random() < 0.5 ? this.getRandomMove() : this.getOptimalMove();
+            case 'hard':
+                return this.getOptimalMove();
+            default:
+                return this.getRandomMove();
+        }
+    }
+
+    getRandomMove() {
+        const emptyCells = this.board
+            .map((cell, index) => cell === '' ? index : null)
+            .filter(cell => cell !== null);
+        return emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    }
+
+    getOptimalMove() {
         let bestScore = -Infinity;
         let bestMove = null;
 
         for (let i = 0; i < 9; i++) {
-            if (!this.board[i]) {
+            if (this.board[i] === '') {
                 this.board[i] = 'O';
                 let score = this.minimax(this.board, 0, false);
                 this.board[i] = '';
@@ -180,15 +140,16 @@ class TicTacToe {
         }
         return bestMove;
     }
+
     minimax(board, depth, isMaximizing) {
-        if (this.checkWinForMinimax('O')) return 1;
-        if (this.checkWinForMinimax('X')) return -1;
+        if (this.checkWinForPlayer('O')) return 1;
+        if (this.checkWinForPlayer('X')) return -1;
         if (this.checkDraw()) return 0;
 
         if (isMaximizing) {
             let bestScore = -Infinity;
             for (let i = 0; i < 9; i++) {
-                if (!board[i]) {
+                if (board[i] === '') {
                     board[i] = 'O';
                     let score = this.minimax(board, depth + 1, false);
                     board[i] = '';
@@ -199,7 +160,7 @@ class TicTacToe {
         } else {
             let bestScore = Infinity;
             for (let i = 0; i < 9; i++) {
-                if (!board[i]) {
+                if (board[i] === '') {
                     board[i] = 'X';
                     let score = this.minimax(board, depth + 1, true);
                     board[i] = '';
@@ -210,19 +171,6 @@ class TicTacToe {
         }
     }
 
-    getRandomEmptyCell() {
-        const emptyCells = this.board
-            .map((cell, index) => cell === '' ? index : null)
-            .filter(cell => cell !== null);
-        return emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    }
-
-    switchPlayer() {
-        this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
-        this.playerTurn.textContent = `Player ${this.currentPlayer}'s Turn`;
-        this.playerTurn.classList.add('switch-animation');
-        setTimeout(() => this.playerTurn.classList.remove('switch-animation'), 500);
-    }
     checkWin() {
         const winPatterns = [
             [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
@@ -230,39 +178,41 @@ class TicTacToe {
             [0, 4, 8], [2, 4, 6] // Diagonals
         ];
 
-        for (let pattern of winPatterns) {
+        return winPatterns.some(pattern => {
             if (pattern.every(index => this.board[index] === this.currentPlayer)) {
-                this.winningCombination = pattern;
+                this.drawWinLine(pattern);
                 return true;
             }
-        }
-        return false;
+            return false;
+        });
     }
 
-    checkWinForMinimax(player) {
+    checkWinForPlayer(player) {
         const winPatterns = [
             [0, 1, 2], [3, 4, 5], [6, 7, 8],
             [0, 3, 6], [1, 4, 7], [2, 5, 8],
             [0, 4, 8], [2, 4, 6]
         ];
 
-        return winPatterns.some(pattern => {
-            return pattern.every(index => this.board[index] === player);
-        });
+        return winPatterns.some(pattern => 
+            pattern.every(index => this.board[index] === player)
+        );
     }
 
     checkDraw() {
         return this.board.every(cell => cell !== '');
     }
 
-    animateWin() {
-        if (!this.winningCombination) return;
-        
-        this.winningCombination.forEach(index => {
-            this.cells[index].classList.add('winner');
-        });
-        
-        this.drawWinLine(this.winningCombination);
+    handleWin() {
+        this.isGameActive = false;
+        setTimeout(() => {
+            this.showModal('🎉 Winner!', `Player ${this.currentPlayer} wins!`);
+        }, 1000);
+    }
+
+    handleDraw() {
+        this.isGameActive = false;
+        this.showModal('🤝 Draw!', "It's a draw!");
     }
 
     drawWinLine(pattern) {
@@ -287,6 +237,20 @@ class TicTacToe {
         this.winLine.style.opacity = '1';
     }
 
+    switchPlayer() {
+        this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+        this.updateTurnIndicator();
+    }
+
+    updateTurnIndicator() {
+        this.playerIndicator.textContent = `Player ${this.currentPlayer}'s Turn`;
+        this.turnLine.style.width = '100%';
+        this.turnLine.style.width = '0';
+        setTimeout(() => {
+            this.turnLine.style.width = '100%';
+        }, 50);
+    }
+
     showModal(title, message) {
         this.modalTitle.textContent = title;
         this.modalMessage.textContent = message;
@@ -294,22 +258,23 @@ class TicTacToe {
     }
 
     resetGame() {
-        if (!this.gameStarted) return;  // Add this line
+        if (!this.gameStarted) return;
+        
         this.board = Array(9).fill('');
         this.currentPlayer = 'X';
         this.isGameActive = true;
-        this.winningCombination = null;
+        
         this.cells.forEach(cell => {
-            cell.textContent = '';
             cell.removeAttribute('data-symbol');
-            cell.classList.remove('winner');
+            cell.style.animation = 'none';
         });
+        
         this.winLine.style.opacity = '0';
-        this.playerTurn.textContent = `Player ${this.currentPlayer}'s Turn`;
+        this.updateTurnIndicator();
     }
 }
 
-// Initialize the game
+// Initialize the game when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new TicTacToe();
 });
