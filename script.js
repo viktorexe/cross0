@@ -40,12 +40,17 @@ class TicTacToe {
 
         this.cells.forEach(cell => {
             cell.addEventListener('click', () => this.handleCellClick(cell));
-        });
-
-        this.resetButton.addEventListener('click', () => this.resetGame());
-        this.modalButton.addEventListener('click', () => {
-            this.modal.classList.add('hidden');
-            this.resetGame();
+            
+            // Add hover effects
+            cell.addEventListener('mouseenter', () => {
+                if (!cell.dataset.symbol && this.isGameActive) {
+                    cell.dataset.hover = this.currentPlayer;
+                }
+            });
+            
+            cell.addEventListener('mouseleave', () => {
+                delete cell.dataset.hover;
+            });
         });
     }
 
@@ -80,21 +85,27 @@ class TicTacToe {
 
     makeMove(index) {
         this.board[index] = this.currentPlayer;
-        this.cells[index].dataset.symbol = this.currentPlayer;
-        this.cells[index].style.animation = 'symbolAppear 0.3s ease-out';
-
+        const cell = this.cells[index];
+        cell.setAttribute('data-symbol', this.currentPlayer);
+        
+        // Remove any existing animation class
+        cell.style.animation = 'none';
+        cell.offsetHeight; // Trigger reflow
+        cell.style.animation = null;
+    
         if (this.checkWin()) {
             this.handleWin();
             return;
         }
-
+    
         if (this.checkDraw()) {
             this.handleDraw();
             return;
         }
-
+    
         this.switchPlayer();
     }
+    
 
     makeAIMove() {
         const index = this.getBestMove();
@@ -266,12 +277,16 @@ class TicTacToe {
         
         this.cells.forEach(cell => {
             cell.removeAttribute('data-symbol');
+            cell.removeAttribute('data-hover');
             cell.style.animation = 'none';
+            cell.offsetHeight; // Trigger reflow
+            cell.style.animation = null;
         });
         
         this.winLine.style.opacity = '0';
         this.updateTurnIndicator();
     }
+    
 }
 
 // Initialize the game when the DOM is loaded

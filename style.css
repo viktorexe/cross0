@@ -184,6 +184,12 @@ body {
     font-weight: bold;
     animation: symbolAppear 0.3s ease-out;
 }
+.cell:not([data-symbol]):hover::before {
+    content: attr(data-hover);
+    color: rgba(44, 62, 80, 0.2); /* var(--primary-color) with opacity */
+    font-size: 3.5rem;
+    font-weight: bold;
+}
 
 .win-line {
     position: absolute;
