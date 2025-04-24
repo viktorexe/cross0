@@ -315,3 +315,21 @@ footer {
         opacity: 1;
     }
 }
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--neon-color);
+    color: var(--background-color);
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
