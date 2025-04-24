@@ -7,7 +7,8 @@ class TicTacToe {
         this.isGameActive = false;
         this.winningCombination = null;
         this.isAnimating = false;
-
+        this.gameStarted = false;  // Add this line
+    
         this.initializeElements();
         this.setupEventListeners();
         this.setupModalEvents();
@@ -79,9 +80,12 @@ class TicTacToe {
     }
 
     startGame() {
-        this.gameBoard.classList.remove('hidden');
-        this.isGameActive = true;
-        this.resetGame();
+        if (!this.gameStarted) {
+            this.gameStarted = true;
+            this.gameBoard.classList.remove('hidden');
+            this.isGameActive = true;
+            this.resetGame();
+        }
     }
 
     handleCellClick(cell) {
@@ -290,6 +294,7 @@ class TicTacToe {
     }
 
     resetGame() {
+        if (!this.gameStarted) return;  // Add this line
         this.board = Array(9).fill('');
         this.currentPlayer = 'X';
         this.isGameActive = true;
