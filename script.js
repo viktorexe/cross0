@@ -26,6 +26,11 @@ class TicTacToe {
         this.turnLine = document.querySelector('.turn-line');
         this.winLine = document.querySelector('.win-line');
         this.themeToggle = document.getElementById('themeToggle');
+        
+        // Contact Modal Elements
+        this.contactButton = document.getElementById('contactButton');
+        this.contactModal = document.getElementById('contactModal');
+        this.closeContactModal = document.getElementById('closeContactModal');
     }
 
     setupEventListeners() {
@@ -74,6 +79,34 @@ class TicTacToe {
         
         // Theme toggle
         this.addTouchClickHandler(this.themeToggle, () => this.toggleTheme());
+        
+        // Contact modal
+        this.addTouchClickHandler(this.contactButton, () => this.openContactModal());
+        
+        // Fix for close button
+        document.getElementById('closeContactModal').addEventListener('click', () => {
+            this.closeContactModal();
+        });
+        
+        // Close contact modal when clicking outside
+        this.contactModal.addEventListener('click', (e) => {
+            if (e.target === this.contactModal) {
+                this.closeContactModal();
+            }
+        });
+    }
+    
+    openContactModal() {
+        this.contactModal.classList.remove('hidden');
+        this.contactModal.classList.add('visible');
+    }
+    
+    closeContactModal() {
+        // Fix for the close button functionality
+        this.contactModal.classList.remove('visible');
+        setTimeout(() => {
+            this.contactModal.classList.add('hidden');
+        }, 300);
     }
     
     initTheme() {
