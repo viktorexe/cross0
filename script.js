@@ -2,6 +2,7 @@ class TicTacToe {
     constructor() {
         this.initialize();
         this.setupEventListeners();
+        this.initTheme();
     }
 
     initialize() {
@@ -24,6 +25,7 @@ class TicTacToe {
         this.modalButton = document.getElementById('modalButton');
         this.turnLine = document.querySelector('.turn-line');
         this.winLine = document.querySelector('.win-line');
+        this.themeToggle = document.getElementById('themeToggle');
     }
 
     setupEventListeners() {
@@ -69,9 +71,55 @@ class TicTacToe {
     
         // Modal button
         this.addTouchClickHandler(this.modalButton, () => this.restartGame());
+        
+        // Theme toggle
+        this.addTouchClickHandler(this.themeToggle, () => this.toggleTheme());
     }
     
-
+    initTheme() {
+        // Check if user has a saved preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        
+        // Make sure the toggle button is initialized correctly
+        this.updateThemeToggleIcon();
+    }
+    
+    toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        // Update the toggle button icon
+        this.updateThemeToggleIcon();
+        
+        // Add animation effect
+        document.body.style.transition = 'background 0.3s ease, color 0.3s ease';
+        setTimeout(() => {
+            document.body.style.transition = '';
+        }, 300);
+    }
+    
+    updateThemeToggleIcon() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const sunIcon = this.themeToggle.querySelector('.sun-icon');
+        const moonIcon = this.themeToggle.querySelector('.moon-icon');
+        
+        if (currentTheme === 'dark') {
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+        } else {
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        }
+    }
+    
     startTwoPlayerGame() {
         this.gameMode = '2player';
         this.startGame();
@@ -80,16 +128,21 @@ class TicTacToe {
     startAIGame() {
         this.gameMode = 'ai';
         this.difficultySelect.classList.remove('hidden');
+        // Add animation class
+        this.difficultySelect.classList.add('visible');
     }
 
     startGame() {
         this.gameStarted = true;
         this.isGameActive = true;
         this.gameBoard.classList.remove('hidden');
+        // Add animation class
+        this.gameBoard.classList.add('visible');
         this.resetButton.classList.remove('hidden');
         this.resetGame();
         this.updateTurnIndicator();
     }
+
     addTouchClickHandler(element, handler) {
         let touchStartTime;
         let touchStartX;
@@ -99,12 +152,17 @@ class TicTacToe {
             touchStartTime = Date.now();
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
+            // Add active state
+            element.classList.add('active');
         }, { passive: true });
     
         element.addEventListener('touchend', (e) => {
             const touchEndTime = Date.now();
             const touchEndX = e.changedTouches[0].clientX;
             const touchEndY = e.changedTouches[0].clientY;
+            
+            // Remove active state
+            element.classList.remove('active');
             
             // Check if it's a tap (quick touch without much movement)
             const touchDuration = touchEndTime - touchStartTime;
@@ -127,6 +185,7 @@ class TicTacToe {
             }
         });
     }
+
     // Update handleCellClick to be more responsive
     handleCellClick(cell) {
         const index = cell.dataset.index;
@@ -182,7 +241,6 @@ class TicTacToe {
         }
         return null;
     }
-    
 
     makeAIMove() {
         const index = this.getBestMove();
@@ -190,409 +248,45 @@ class TicTacToe {
             this.makeMove(index);
         }
     }
-    createFireworks() {
+
+    createConfetti() {
         const colors = ['#FFD700', '#FFA500', '#FF8C00', '#FF6347', '#4CAF50', '#3498db'];
-        const fireworksContainer = document.createElement('div');
-        fireworksContainer.className = 'fireworks-container';
-        document.body.appendChild(fireworksContainer);
-    
-        for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-                const firework = document.createElement('div');
-                firework.className = 'firework';
-                firework.style.setProperty('--x', `${Math.random() * 100}vw`);
-                firework.style.setProperty('--initialY', '100vh');
-                firework.style.setProperty('--finalY', `${Math.random() * 50}vh`);
-                firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                fireworksContainer.appendChild(firework);
-            }, i * 50);
+        const confettiContainer = document.createElement('div');
+        confettiContainer.style.position = 'fixed';
+        confettiContainer.style.top = '0';
+        confettiContainer.style.left = '0';
+        confettiContainer.style.width = '100%';
+        confettiContainer.style.height = '100%';
+        confettiContainer.style.pointerEvents = 'none';
+        confettiContainer.style.zIndex = '1000';
+        document.body.appendChild(confettiContainer);
+
+        const confettiPieces = 100; // Number of confetti pieces
+
+        for (let i = 0; i < confettiPieces; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'absolute';
+            confetti.style.width = `${Math.random() * 10 + 5}px`;
+            confetti.style.height = `${Math.random() * 10 + 5}px`;
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.left = `${Math.random() * 100}%`;
+            confetti.style.top = '-20px';
+            confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+            confetti.style.opacity = Math.random() + 0.5;
+            
+            // Animation
+            confetti.style.animation = `confettiDrop ${Math.random() * 3 + 2}s ease-in forwards`;
+            confetti.style.animationDelay = `${Math.random() * 2}s`;
+            
+            confettiContainer.appendChild(confetti);
         }
-    
+
+        // Clean up confetti after animation
         setTimeout(() => {
-            document.body.removeChild(fireworksContainer);
-        }, 3000);
-    }
-    
-    createStarBurst(x, y) {
-        const container = document.createElement('div');
-        container.style.position = 'fixed';
-        container.style.left = x + 'px';
-        container.style.top = y + 'px';
-        container.style.pointerEvents = 'none';
-        document.body.appendChild(container);
-    
-        for (let i = 0; i < 12; i++) {
-            const star = document.createElement('div');
-            star.className = 'star-burst';
-            star.style.transform = `rotate(${i * 30}deg)`;
-            container.appendChild(star);
-        }
-    
-        setTimeout(() => {
-            document.body.removeChild(container);
-        }, 1000);
-    }
-    
-    showTrophy() {
-        const trophy = document.createElement('div');
-        trophy.className = 'trophy';
-        trophy.textContent = '🏆';
-        document.body.appendChild(trophy);
-    
-        setTimeout(() => {
-            document.body.removeChild(trophy);
-        }, 2000);
-    }
-    
-    handleWin() {
-        this.isGameActive = false;
-        
-        // Animate winning cells with delay
-        if (this.winningCombination) {
-            this.winningCombination.forEach((index, i) => {
-                setTimeout(() => {
-                    const cell = this.cells[index];
-                    cell.classList.add('winner');
-                    
-                    // Create star burst effect at cell position
-                    const rect = cell.getBoundingClientRect();
-                    this.createStarBurst(
-                        rect.left + rect.width / 2,
-                        rect.top + rect.height / 2
-                    );
-                }, i * 200);
-            });
-        }
-    
-        // Create multiple effects
-        setTimeout(() => {
-            this.createFireworks();
-            this.showTrophy();
-        }, 500);
-    
-        // Show winning modal with delay
-        setTimeout(() => {
-            this.showModal('🎉 Winner!', `Player ${this.currentPlayer} wins!`);
-        }, 2000);
-    }
-    
-    showModal(title, message) {
-        if (!this.gameStarted) return;
-        
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h2>${title}</h2>
-                <p>${message}</p>
-                <button class="premium-button">
-                    <span>Play Again</span>
-                </button>
-            </div>
-        `;
-        
-        // Add animation classes
-        modal.classList.add('modal-animate');
-        
-        document.body.appendChild(modal);
-        
-        const button = modal.querySelector('button');
-        button.addEventListener('click', () => {
-            modal.classList.add('modal-exit');
-            setTimeout(() => {
-                document.body.removeChild(modal);
-                this.resetGame();
-            }, 500);
-        });
-    }
-    createFireworks() {
-        const colors = ['#FFD700', '#FFA500', '#FF8C00', '#FF6347', '#4CAF50', '#3498db'];
-        const fireworksContainer = document.createElement('div');
-        fireworksContainer.className = 'fireworks-container';
-        document.body.appendChild(fireworksContainer);
-    
-        for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-                const firework = document.createElement('div');
-                firework.className = 'firework';
-                firework.style.setProperty('--x', `${Math.random() * 100}vw`);
-                firework.style.setProperty('--initialY', '100vh');
-                firework.style.setProperty('--finalY', `${Math.random() * 50}vh`);
-                firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                fireworksContainer.appendChild(firework);
-            }, i * 50);
-        }
-    
-        setTimeout(() => {
-            document.body.removeChild(fireworksContainer);
-        }, 3000);
-    }
-    
-    createStarBurst(x, y) {
-        const container = document.createElement('div');
-        container.style.position = 'fixed';
-        container.style.left = x + 'px';
-        container.style.top = y + 'px';
-        container.style.pointerEvents = 'none';
-        document.body.appendChild(container);
-    
-        for (let i = 0; i < 12; i++) {
-            const star = document.createElement('div');
-            star.className = 'star-burst';
-            star.style.transform = `rotate(${i * 30}deg)`;
-            container.appendChild(star);
-        }
-    
-        setTimeout(() => {
-            document.body.removeChild(container);
-        }, 1000);
-    }
-    
-    showTrophy() {
-        const trophy = document.createElement('div');
-        trophy.className = 'trophy';
-        trophy.textContent = '🏆';
-        document.body.appendChild(trophy);
-    
-        setTimeout(() => {
-            document.body.removeChild(trophy);
-        }, 2000);
-    }
-    
-    handleWin() {
-        this.isGameActive = false;
-        
-        // Animate winning cells with delay
-        if (this.winningCombination) {
-            this.winningCombination.forEach((index, i) => {
-                setTimeout(() => {
-                    const cell = this.cells[index];
-                    cell.classList.add('winner');
-                    
-                    // Create star burst effect at cell position
-                    const rect = cell.getBoundingClientRect();
-                    this.createStarBurst(
-                        rect.left + rect.width / 2,
-                        rect.top + rect.height / 2
-                    );
-                }, i * 200);
-            });
-        }
-    
-        // Create multiple effects
-        setTimeout(() => {
-            this.createFireworks();
-            this.showTrophy();
-        }, 500);
-    
-        // Show winning modal with delay
-        setTimeout(() => {
-            this.showModal('🎉 Winner!', `Player ${this.currentPlayer} wins!`);
-        }, 2000);
-    }
-    
-    showModal(title, message) {
-        if (!this.gameStarted) return;
-        
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h2>${title}</h2>
-                <p>${message}</p>
-                <button class="premium-button">
-                    <span>Play Again</span>
-                </button>
-            </div>
-        `;
-        
-        // Add animation classes
-        modal.classList.add('modal-animate');
-        
-        document.body.appendChild(modal);
-        
-        const button = modal.querySelector('button');
-        button.addEventListener('click', () => {
-            modal.classList.add('modal-exit');
-            setTimeout(() => {
-                document.body.removeChild(modal);
-                this.resetGame();
-            }, 500);
-        });
-    }
-createFireworks() {
-    const colors = ['#FFD700', '#FFA500', '#FF8C00', '#FF6347', '#4CAF50', '#3498db'];
-    const fireworksContainer = document.createElement('div');
-    fireworksContainer.className = 'fireworks-container';
-    document.body.appendChild(fireworksContainer);
-
-    for (let i = 0; i < 50; i++) {
-        setTimeout(() => {
-            const firework = document.createElement('div');
-            firework.className = 'firework';
-            firework.style.setProperty('--x', `${Math.random() * 100}vw`);
-            firework.style.setProperty('--initialY', '100vh');
-            firework.style.setProperty('--finalY', `${Math.random() * 50}vh`);
-            firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            fireworksContainer.appendChild(firework);
-        }, i * 50);
+            document.body.removeChild(confettiContainer);
+        }, 5000);
     }
 
-    setTimeout(() => {
-        document.body.removeChild(fireworksContainer);
-    }, 3000);
-}
-
-createStarBurst(x, y) {
-    const container = document.createElement('div');
-    container.style.position = 'fixed';
-    container.style.left = x + 'px';
-    container.style.top = y + 'px';
-    container.style.pointerEvents = 'none';
-    document.body.appendChild(container);
-
-    for (let i = 0; i < 12; i++) {
-        const star = document.createElement('div');
-        star.className = 'star-burst';
-        star.style.transform = `rotate(${i * 30}deg)`;
-        container.appendChild(star);
-    }
-
-    setTimeout(() => {
-        document.body.removeChild(container);
-    }, 1000);
-}
-
-showTrophy() {
-    const trophy = document.createElement('div');
-    trophy.className = 'trophy';
-    trophy.textContent = '🏆';
-    document.body.appendChild(trophy);
-
-    setTimeout(() => {
-        document.body.removeChild(trophy);
-    }, 2000);
-}
-
-handleWin() {
-    this.isGameActive = false;
-    
-    // Animate winning cells with delay
-    if (this.winningCombination) {
-        this.winningCombination.forEach((index, i) => {
-            setTimeout(() => {
-                const cell = this.cells[index];
-                cell.classList.add('winner');
-                
-                // Create star burst effect at cell position
-                const rect = cell.getBoundingClientRect();
-                this.createStarBurst(
-                    rect.left + rect.width / 2,
-                    rect.top + rect.height / 2
-                );
-            }, i * 200);
-        });
-    }
-
-    // Create multiple effects
-    setTimeout(() => {
-        this.createFireworks();
-        this.showTrophy();
-    }, 500);
-
-    // Show winning modal with delay
-    setTimeout(() => {
-        this.showModal('🎉 Winner!', `Player ${this.currentPlayer} wins!`);
-    }, 2000);
-}
-createConfetti() {
-    const confettiContainer = document.createElement('div');
-    confettiContainer.style.position = 'fixed';
-    confettiContainer.style.top = '0';
-    confettiContainer.style.left = '0';
-    confettiContainer.style.width = '100%';
-    confettiContainer.style.height = '100%';
-    confettiContainer.style.pointerEvents = 'none';
-    confettiContainer.style.zIndex = '1000';
-    document.body.appendChild(confettiContainer);
-
-    const colors = [
-        '#ffd700', // Gold
-        '#FFA500', // Orange
-        '#FF6347', // Tomato
-        '#4CAF50', // Green
-        '#3498db', // Blue
-        '#9b59b6'  // Purple
-    ];
-
-    const confettiPieces = 150; // Number of confetti pieces
-    const confettiElements = [];
-
-    for (let i = 0; i < confettiPieces; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti-piece';
-        
-        // Randomize confetti properties
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const leftPosition = Math.random() * 100;
-        const width = Math.random() * 8 + 6;
-        const height = width * 1.5;
-        const delay = Math.random() * 3;
-        const duration = Math.random() * 2 + 3;
-        const rotationDirection = Math.random() < 0.5 ? -1 : 1;
-
-        // Apply styles
-        Object.assign(confetti.style, {
-            left: `${leftPosition}%`,
-            width: `${width}px`,
-            height: `${height}px`,
-            backgroundColor: color,
-            transform: `rotate(${Math.random() * 360}deg)`,
-            animation: `confettiDrop ${duration}s ${delay}s ease-in forwards`,
-            boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-            borderRadius: '1px'
-        });
-
-        confettiContainer.appendChild(confetti);
-        confettiElements.push(confetti);
-    }
-
-    // Clean up confetti after animation
-    setTimeout(() => {
-        document.body.removeChild(confettiContainer);
-    }, 6000);
-}
-
-showModal(title, message) {
-    if (!this.gameStarted) return;
-    
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h2>${title}</h2>
-            <p>${message}</p>
-            <button class="premium-button">
-                <span>Play Again</span>
-            </button>
-        </div>
-    `;
-    
-    // Add animation classes
-    modal.classList.add('modal-animate');
-    
-    document.body.appendChild(modal);
-    
-    const button = modal.querySelector('button');
-    button.addEventListener('click', () => {
-        modal.classList.add('modal-exit');
-        setTimeout(() => {
-            document.body.removeChild(modal);
-            this.resetGame();
-        }, 500);
-    });
-}
-    
     getBestMove() {
         switch(this.difficulty) {
             case 'easy':
@@ -719,7 +413,6 @@ showModal(title, message) {
         }, 1500);
     }
     
-    
     handleDraw() {
         this.isGameActive = false;
         this.showModal('🤝 Draw!', "It's a draw!");
@@ -750,10 +443,9 @@ showModal(title, message) {
     
         // Animate the line
         setTimeout(() => {
-            winLine.classList.add('active');
+            winLine.style.opacity = '1';
         }, 100);
     }
-    
 
     switchPlayer() {
         this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
@@ -773,11 +465,9 @@ showModal(title, message) {
             this.turnLine.style.width = '100%';
         }, 50);
     }
-    
 
     updateTurnIndicator() {
         this.playerIndicator.textContent = `Player ${this.currentPlayer}'s Turn`;
-        this.turnLine.style.width = '100%';
         this.turnLine.style.width = '0';
         setTimeout(() => {
             this.turnLine.style.width = '100%';
@@ -790,9 +480,9 @@ showModal(title, message) {
         this.modalTitle.textContent = title;
         this.modalMessage.textContent = message;
         this.modal.classList.remove('hidden');
+        this.modal.classList.add('visible');
         this.isGameActive = false; // Ensure game is inactive when modal is shown
     }
-    
 
     resetGame() {
         if (!this.gameStarted) return;
@@ -812,6 +502,7 @@ showModal(title, message) {
         });
         
         this.winLine.style.opacity = '0';
+        this.modal.classList.remove('visible');
         this.modal.classList.add('hidden');
         this.updateTurnIndicator();
     }
@@ -820,32 +511,18 @@ showModal(title, message) {
         this.resetGame();
         this.isGameActive = true;
         this.updateTurnIndicator();
-        
-        // Hide modal
-        this.modal.classList.add('hidden');
     }
-    
-    createConfetti() {
-        const colors = ['#FFD700', '#FFA500', '#FF8C00', '#FF6347', '#4CAF50', '#3498db'];
-        const container = document.createElement('div');
-        container.className = 'confetti-container';
-        document.body.appendChild(container);
-    
-        for (let i = 0; i < 100; i++) {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.animationDelay = Math.random() * 2 + 's';
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            container.appendChild(confetti);
-        }
-    
-        setTimeout(() => {
-            document.body.removeChild(container);
-        }, 3000);
-    }
-    
 }
+
+// Add keyframe animation for confetti
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+@keyframes confettiDrop {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+`;
+document.head.appendChild(styleSheet);
 
 // Initialize the game when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
