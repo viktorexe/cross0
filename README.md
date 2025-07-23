@@ -1,48 +1,32 @@
 # Luxury Tic Tac Toe
 
-A modern, responsive implementation of the classic Tic Tac Toe game with a sleek UI, dark/light theme, and multiple game modes.
+Welcome to Luxury Tic Tac Toe! This is a modern, feature-rich take on the classic game, designed and developed by viktorexe ([@viktorexe](https://github.com/viktorexe)).
+
+Play it live: [cross0.vercel.app](https://cross0.vercel.app)
 
 ## Features
-
-- **Beautiful UI**: Clean, modern interface with smooth animations
-- **Responsive Design**: Works perfectly on mobile, tablet, and desktop
-- **Game Modes**: Play against a friend or challenge the AI
-- **AI Difficulty Levels**: Easy, Medium, and Hard
-- **Dark/Light Theme**: Toggle between themes with persistent preference
-- **Winning Animations**: Celebrate victories with visual effects
-
-## Screenshots
-
-### Main Screen
-![Main Screen](mainscreen.png)
-
-### Gameplay
-![Gameplay](game.png)
+- Play against a friend or challenge the AI (with Easy, Medium, and Hard modes)
+- Beautiful, responsive design with light and dark themes
+- Fun confetti animation when you win
+- Smooth transitions and modern UI
+- Playable on desktop and mobile
 
 ## How to Play
+1. Choose your game mode: 2 Players or vs AI
+2. If you pick AI, select your preferred difficulty
+3. Take turns marking the board. First to get 3 in a row wins!
+4. If all squares are filled and no one wins, it’s a draw
 
-1. Select game mode: 2 Players or vs AI
-2. If playing against AI, choose a difficulty level
-3. Players take turns marking a square (X goes first)
-4. First player to get 3 marks in a row (horizontally, vertically, or diagonally) wins
-5. If all squares are filled with no winner, it's a draw
+## Local Setup
+1. Clone this repository:
+   ```
+   git clone https://github.com/viktorexe/cross0.git
+   ```
+2. Open the folder and simply open `index.html` in your browser. No build steps needed!
 
-## Technologies Used
-
-- HTML5
-- CSS3 (with modern features like CSS variables, flexbox, grid)
-- JavaScript (ES6+)
-- Local Storage for theme persistence
-
-## Developer
-
-**Vansh Sharma (viktorexe)** - Full Stack Developer
-
-- GitHub: [github.com/viktorexe](https://github.com/viktorexe)
-- LinkedIn: [linkedin.com/in/vansh-sharma-293802355](https://linkedin.com/in/vansh-sharma-293802355)
-- Portfolio: [vanshfolio.vercel.app](https://vanshfolio.vercel.app)
-- Email: developer.viktorexe@gmail.com
+## Credits
+Made by viktorexe
+- [GitHub](https://github.com/viktorexe)
 
 ## License
-
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source under the MIT License. See [LICENSE](LICENSE) for details.
