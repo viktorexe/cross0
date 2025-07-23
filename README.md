@@ -1,4 +1,4 @@
-# Luxury Tic Tac Toe
+# Tic Tac Toe
 
 Welcome to Luxury Tic Tac Toe! This is a modern, feature-rich take on the classic game, designed and developed by viktorexe ([@viktorexe](https://github.com/viktorexe)).
 
