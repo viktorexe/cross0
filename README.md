@@ -1,6 +1,6 @@
 # Tic Tac Toe
 
-Welcome to Luxury Tic Tac Toe! This is a modern, feature-rich take on the classic game, designed and developed by viktorexe ([@viktorexe](https://github.com/viktorexe)).
+This is a modern, feature-rich take on the classic game, designed and developed by viktorexe ([@viktorexe](https://github.com/viktorexe)).
 
 Play it live: [cross0.vercel.app](https://cross0.vercel.app)
 
